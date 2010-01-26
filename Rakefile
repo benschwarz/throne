@@ -11,6 +11,7 @@ begin
     gem.homepage = "http://github.com/lstoll/throne"
     gem.authors = ["Lincoln Stoll", "Ben Schwarz"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
+    gem.add_development_dependency "rest-client-components"
     gem.add_dependency "rest-client", ">= 1.0.3"
     gem.add_dependency "hashie", ">= 0.1.5"
     gem.add_dependency "yajl-ruby", ">= 0.6.7"
