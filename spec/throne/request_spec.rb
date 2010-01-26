@@ -1,37 +1,35 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe Throne::Document do
+describe Throne::Request do
   before :all do
     @host = "http://127.0.0.1:5984"
     @db = "throne-request-specs"
-    Throne.database = @db
+    Throne::Database.setup(:throne_request_specs, "http://127.0.0.1:5984/throne-request-specs")
   end
   
-  it "should raise an error without a database having been set" do
-    Throne.database = nil
-    lambda { Throne::Request.get }.should raise_error(Throne::Database::NameError)
-    Throne.database = @db
+  it "should raise an error without a database having been sent" do
+    lambda { Throne::Request.get }.should raise_error(Throne::Database::NotSetup)
   end
   
   it "should make all requests asking for gzip and deflate" do
     RestClient.should_receive(:put).with("#{@host}/#{@db}/", "{}", { :accept_encoding  => "gzip, deflate" })
-    Throne::Database.create
+    Throne::Database.create(:throne_request_specs)
   end
   
   shared_examples_for "paramification" do    
     it "should be json encoded" do
       RestClient.should_receive(:get).with("#{@host}/#{@db}/document?startkey=%5B%22abc%22%2C%22xyz%22%5D", {:accept_encoding=>"gzip, deflate"})
-      Throne::Request.get :resource => "document", :params => {:startkey => ["abc", "xyz"]}
+      Throne::Request.get :database => :throne_request_specs, :resource => "document", :params => {:startkey => ["abc", "xyz"]}
     end
     
     it "should uri escape each param value" do
       RestClient.should_receive(:get).with("#{@host}/#{@db}/document?descending=true", {:accept_encoding=>"gzip, deflate"})
-      Throne::Request.get :resource => "document", :params => {:descending => true}
+      Throne::Request.get :database => :throne_request_specs, :resource => "document", :params => {:descending => true}
     end
     
     it "should join using an &" do
       RestClient.should_receive(:get).with("#{@host}/#{@db}/document?descending=true&limit=1", {:accept_encoding=>"gzip, deflate"})
-      Throne::Request.get :resource => "document", :params => {:descending => true, :limit => 1}
+      Throne::Request.get :database => :throne_request_specs, :resource => "document", :params => {:descending => true, :limit => 1}
     end
   end
   
@@ -42,7 +40,7 @@ describe Throne::Document do
     
     it "should get" do
       RestClient.should_receive(:get).with("#{@host}/#{@db}/document", {:accept_encoding=>"gzip, deflate"})
-      Throne::Request.get(:resource => "document")
+      Throne::Request.get(:resource => "document", :database => :throne_request_specs)
     end
   end
   
@@ -53,21 +51,21 @@ describe Throne::Document do
     
     it "should delete" do
       RestClient.should_receive(:delete).with("#{@host}/#{@db}/document", {:accept_encoding=>"gzip, deflate"})
-      Throne::Request.delete(:resource => "document")
+      Throne::Request.delete(:resource => "document", :database => :throne_request_specs)
     end
   end
   
   describe "put" do
     it "should put" do
       RestClient.should_receive(:put).with("#{@host}/#{@db}/document", "{}", {:accept_encoding=>"gzip, deflate"})
-      Throne::Request.put(:resource => "document")
+      Throne::Request.put(:resource => "document", :database => :throne_request_specs)
     end
   end
   
   describe "post" do
     it "should post" do
       RestClient.should_receive(:post).with("#{@host}/#{@db}/document", "{}", {:accept_encoding=>"gzip, deflate"})
-      Throne::Request.post(:resource => "document")
+      Throne::Request.post(:resource => "document", :database => :throne_request_specs)
     end
   end
 end
