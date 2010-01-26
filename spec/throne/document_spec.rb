@@ -1,24 +1,47 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-class TestDocument < Throne::Document
-end
-
 describe Throne::Document do
   before :all do
-    Throne.database = "throne-document-specs"
-    Throne::Database.destroy
-    Throne::Database.create
+    Throne::Database.setup(:document_specs, "http://127.0.0.1:5984/throne-document-specs")
+    
+    class TestDocument < Throne::Document
+      database :document_specs
+    end
+    
+    class TestDocumentWithDefault < Throne::Document
+    end
+    
+    Throne::Database.create(:default)
+    Throne::Database.create(:document_specs)
+  end
+
+  describe "database selection" do
+    it "should use the default database" do
+      Throne::Document.database.should == :default
+    end
+    
+    it "should set the database" do
+      Throne::Document.database(:document_specs)
+      Throne::Document.database.should == :document_specs
+    end
+    
+    it "should raise an error" do
+      lambda { Throne::Document.database(:not_setup) }.should raise_error(Throne::Database::NotSetup)
+    end
+    
+    it "will use the default database" do
+      TestDocumentWithDefault.database.should == :default
+    end
   end
 
   describe "crud" do
-    describe "with class methods" do
+    describe "with class methods" do   
       before :all do
         @doc = TestDocument.create(:field => true)
-      end
-            
+      end    
+
       it "should create a document" do
-        @doc.should be_an_instance_of(TestDocument)
-        lambda { RestClient.get([Throne.server, Throne.database, @doc._id].join('/')) }.should_not raise_error
+        TestDocument.create(:field => true).should be_an_instance_of(TestDocument)
       end
 
       it "should get a document" do
@@ -44,25 +67,9 @@ describe Throne::Document do
       end
       
     end
-    
-    describe "with instance methods" do
-      before :each do
-        @doc = TestDocument.create(:field => true)
-      end
-      
-      it "should save the document" do
-        @doc.save.should be_an_instance_of(TestDocument)
-      end
-
-      it "should destroy the document" do
-        @doc.destroy.should be_true
-        lambda { TestDocument.get(@doc._id) }.should raise_error(Throne::Document::NotFound)
-        @doc.destroy.should be_true # subseqent destroys should not raise.
-      end
-    end
   end
   
-  describe "instance" do
+  describe "instance" do    
     before :each do
       @doc = TestDocument.create(:field => true)
     end
@@ -115,6 +122,12 @@ describe Throne::Document do
       it "should not be the same" do
         @doc.should_not == TestDocument.create(:field => true)
       end
+    end
+
+    it "should destroy the document" do
+      @doc.destroy.should be_true
+      lambda { TestDocument.get(@doc._id) }.should raise_error(Throne::Document::NotFound)
+      @doc.destroy.should be_true # subseqent destroys should not raise.
     end
   end
 end
