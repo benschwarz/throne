@@ -5,6 +5,9 @@ require 'throne'
 require 'spec'
 require 'spec/autorun'
 
+require 'restclient/components'
+RestClient.enable Rack::CommonLogger, STDOUT
+
 Spec::Runner.configure do |config|
   
 end
