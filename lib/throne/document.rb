@@ -1,8 +1,17 @@
 class Throne::Document < Hashie::Mash
   class NotFound < StandardError; end
-  
   ## Class methods
-  class << self   
+  class << self
+    # Sets the database that the class will use
+    def database(name = nil)
+      if name.nil?
+        @database || :default
+      else
+        raise Throne::Database::NotSetup, "ensure that you've setup your database before using it in a class definition" unless Throne::Database.setup?(name)
+        @database = name
+      end
+    end
+    
     # Create a new document and persist it to the database
     # @params [Hash] Properties to be persisted
     # @return [self]
@@ -19,7 +28,7 @@ class Throne::Document < Hashie::Mash
         response = Throne::Request.get(:resource => id, :params => params)
         new.merge(response)
       rescue RestClient::ResourceNotFound
-        raise NotFound, "#{id} was not found in #{Throne.database}"
+        raise NotFound, "#{id} was not found in #{@database}"
       end
     end
     
