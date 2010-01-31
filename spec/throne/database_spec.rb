@@ -38,11 +38,7 @@ describe Throne::Database do
   describe "with a database set" do
     before :all do
       Throne::Database.setup(:throne_database_specs, "http://127.0.0.1:5984/throne-database-specs")
-      
-      begin
-        Throne::Database.destroy(:throne_database_specs)
-      rescue RestClient::ResourceNotFound
-      end
+      Throne::Database.destroy(:throne_database_specs)
     end
     
     it "should create the database" do
