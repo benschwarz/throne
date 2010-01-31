@@ -25,7 +25,7 @@ class Throne::Document < Hashie::Mash
     # @return [Hash] the document mapped to a hash, or nil if not found.
     def get(id, params = {})
       begin
-        response = Throne::Request.get(:resource => id, :params => params)
+        response = Throne::Request.get(:resource => id, :params => params, :database => database)
         new.merge(response)
       rescue RestClient::ResourceNotFound
         raise NotFound, "#{id} was not found in #{@database}"
@@ -49,17 +49,15 @@ class Throne::Document < Hashie::Mash
     super(attributes)
   end
   
-  def _id; self[:_id]; end
-  def _rev; self[:_rev]; end
-  
   # Persist a document to the database
   # @param [Hash] The document properties
   # @return [Hash]
   def save(attributes = {})
     if new_record?
-      response = Throne::Request.post normalise(attributes).to_hash
+      data = {:database => self.class.database}.merge normalise(attributes).to_hash
+      response = Throne::Request.post data
     else
-      data = {:resource => _id}.merge normalise(attributes).to_hash
+      data = {:resource => _id, :database => self.class.database}.merge normalise(attributes).to_hash
       response = Throne::Request.put data
     end
     
@@ -70,7 +68,7 @@ class Throne::Document < Hashie::Mash
   # @param [String] Document ID
   # @return [TrueClass]
   def destroy
-    true if Throne::Request.delete(:resource => _id, :params => {:rev => _rev}).key? "ok"
+    true if Throne::Request.delete(:resource => _id, :params => {:rev => _rev}, :database => self.class.database).key? "ok"
   rescue RestClient::ResourceNotFound
     true
   end
@@ -84,7 +82,7 @@ class Throne::Document < Hashie::Mash
   private
   def normalise(hash)
     # Merge the hash with self
-    merge!(hash)
+    merge!(hash) unless hash.nil?
     
     # Rename id and rev to _id and _rev
     %w(id rev).each do |attribute|
