@@ -1,19 +1,17 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe Throne::Document do
-  before :all do
-    Throne::Database.setup(:document_specs, "http://127.0.0.1:5984/throne-document-specs")
-    
-    class TestDocument < Throne::Document
-      database :document_specs
-    end
-    
-    class TestDocumentWithDefault < Throne::Document
-    end
-    
-    Throne::Database.create(:document_specs)
-  end
+Throne::Database.setup(:document_specs, "http://127.0.0.1:5984/throne-document-specs")
+Throne::Database.create(:document_specs)
 
+class TestDocument < Throne::Document
+  database :document_specs
+end
+
+class TestDocumentWithDefault < Throne::Document
+end
+
+
+describe Throne::Document do
   describe "database selection" do
     it "should use the default database" do
       Throne::Document.database.should == :default
