@@ -44,9 +44,9 @@ class Throne::Document < Hashie::Mash
   
   ## Instance methods
   
-  def initialize(attributes = nil, default = nil, &block)
+  def initialize(attributes = nil)
     self[:ruby_class] = self.class.name
-    super(attributes, default, &block)
+    super(attributes)
   end
   
   def _id; self[:_id]; end
