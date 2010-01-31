@@ -11,7 +11,6 @@ describe Throne::Document do
     class TestDocumentWithDefault < Throne::Document
     end
     
-    Throne::Database.create(:default)
     Throne::Database.create(:document_specs)
   end
 
@@ -23,6 +22,7 @@ describe Throne::Document do
     it "should set the database" do
       Throne::Document.database(:document_specs)
       Throne::Document.database.should == :document_specs
+      Throne::Document.database(:default)
     end
     
     it "should raise an error" do
@@ -34,43 +34,38 @@ describe Throne::Document do
     end
   end
 
-  describe "crud" do
-    describe "with class methods" do   
-      before :all do
-        @doc = TestDocument.create(:field => true)
-      end    
+  describe "class methods" do
+    it "should create a document" do
+      TestDocument.create(:field => true).should be_an_instance_of(TestDocument)
+    end
 
-      it "should create a document" do
-        TestDocument.create(:field => true).should be_an_instance_of(TestDocument)
-      end
+    it "should get a document" do
+      doc = TestDocument.create(:field => true)
+      TestDocument.get(doc._id).should == doc
+    end
+    
+    it "should get a document with params" do
+      RestClient.should_receive(:get).with(/descending=true/, {:accept_encoding=>"gzip, deflate"})
+      TestDocument.get("fake-id", {:descending => true})
+    end
+    
+    it "should get a specific revision" do
+      doc = TestDocument.create(:field => true)
+      rev = doc._rev
+      doc.save # Create a new revision
+      TestDocument.get(doc._id, {:rev => rev}).should_not == doc
+    end
 
-      it "should get a document" do
-        TestDocument.get(@doc._id).should == @doc
-      end
-      
-      it "should get a document with params" do
-        RestClient.should_receive(:get).with(/descending=true/, anything())
-        TestDocument.get(@doc._id, {:descending => true}).should be_an_instance_of(TestDocument)
-      end
-      
-      it "should get a specific revision" do
-        rev = @doc._rev
-        @doc.save # Create a new revision
-        TestDocument.get(@doc._id, {:rev => rev}).should_not == @doc
-      end
-
-      it "should destroy a document" do
-        doc = TestDocument.create(:field => true)
-        TestDocument.destroy(doc._id).should be_true
-        lambda { TestDocument.get(doc._id) }.should raise_error(Throne::Document::NotFound)
-        TestDocument.destroy(doc._id).should be_true # subseqent destroys should not raise.
-      end
-      
+    it "should destroy a document" do
+      doc = TestDocument.create(:field => true)
+      TestDocument.destroy(doc._id).should be_true
+      lambda { TestDocument.get(doc._id) }.should raise_error(Throne::Document::NotFound)
+      TestDocument.destroy(doc._id).should be_true # subseqent destroys should not raise.
     end
   end
   
-  describe "instance" do    
-    before :each do
+  describe "instance methods" do    
+    before :all do
       @doc = TestDocument.create(:field => true)
     end
     
@@ -127,7 +122,7 @@ describe Throne::Document do
     it "should destroy the document" do
       @doc.destroy.should be_true
       lambda { TestDocument.get(@doc._id) }.should raise_error(Throne::Document::NotFound)
-      @doc.destroy.should be_true # subseqent destroys should not raise.
+      @doc.destroy.should be_true # subsequent calls to destroy should not raise.
     end
   end
 end
