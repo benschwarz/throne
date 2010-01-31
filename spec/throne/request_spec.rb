@@ -7,10 +7,6 @@ describe Throne::Request do
     Throne::Database.setup(:throne_request_specs, "http://127.0.0.1:5984/throne-request-specs")
   end
   
-  it "should raise an error without a database having been sent" do
-    lambda { Throne::Request.get }.should raise_error(Throne::Database::NotSetup)
-  end
-  
   it "should make all requests asking for gzip and deflate" do
     RestClient.should_receive(:put).with("#{@host}/#{@db}/", "{}", { :accept_encoding  => "gzip, deflate" })
     Throne::Database.create(:throne_request_specs)
@@ -28,7 +24,7 @@ describe Throne::Request do
     end
     
     it "should join using an &" do
-      RestClient.should_receive(:get).with("#{@host}/#{@db}/document?descending=true&limit=1", {:accept_encoding=>"gzip, deflate"})
+      RestClient.should_receive(:get).with(/&/, {:accept_encoding=>"gzip, deflate"})
       Throne::Request.get :database => :throne_request_specs, :resource => "document", :params => {:descending => true, :limit => 1}
     end
   end
