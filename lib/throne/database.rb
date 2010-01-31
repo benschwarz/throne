@@ -24,8 +24,8 @@ class Throne::Database
     # @params [Symbol] Name of the database to use (that has been setup using the setup method)
     def create(db)
       Throne::Request.put :database => db
-    rescue RestClient::RequestFailed => e
-      super unless e.message =~ /412$/
+    rescue RestClient::PreconditionFailed
+      # Database already exists
     end
     
     # Destroy the database
