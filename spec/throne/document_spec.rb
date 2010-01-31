@@ -30,6 +30,16 @@ describe Throne::Document do
     it "will use the default database" do
       TestDocumentWithDefault.database.should == :default
     end
+    
+    it "should make a request to the throne-specs database" do
+      Throne::Request.should_receive(:post).with({:database=>:default, "ruby_class"=>"TestDocumentWithDefault"})
+      TestDocumentWithDefault.create
+    end
+    
+    it "should make a request the throne-document-specs database" do
+      Throne::Request.should_receive(:post).with({:database=>:document_specs, "ruby_class"=>"TestDocument"})
+      TestDocument.create
+    end
   end
 
   describe "class methods" do
