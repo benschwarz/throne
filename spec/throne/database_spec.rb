@@ -53,7 +53,7 @@ describe Throne::Database do
     it "should destroy the database" do
       Throne::Database.create(:throne_database_specs)
       Throne::Database.destroy(:throne_database_specs).should be_true
-      lambda { Throne::Database.destroy(:throne_database_specs) }.should raise_error(RestClient::ResourceNotFound)
+      lambda { Throne::Database.destroy(:throne_database_specs) }.should_not raise_error(RestClient::ResourceNotFound)
     end
     
     it "should not error when creating a database that exists" do
