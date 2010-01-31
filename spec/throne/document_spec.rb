@@ -53,8 +53,9 @@ describe Throne::Document do
     end
     
     it "should get a document with params" do
-      RestClient.should_receive(:get).with(/descending=true/, {:accept_encoding=>"gzip, deflate"})
-      TestDocument.get("fake-id", {:descending => true})
+      doc = TestDocument.create
+      Throne::Request.should_receive(:get).with({:params=>{:descending=>true}, :resource=>doc._id, :database=>:document_specs})
+      TestDocument.get(doc._id, {:descending => true})
     end
     
     it "should get a specific revision" do
