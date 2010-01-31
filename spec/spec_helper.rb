@@ -9,5 +9,11 @@ require 'restclient/components'
 RestClient.enable Rack::CommonLogger, STDOUT
 
 Spec::Runner.configure do |config|
-  
+  config.before :suite do
+    unless Throne::Database.setup?(:default)
+      Throne::Database.setup(:default, "http://127.0.0.1:5984/throne-specs")
+      Throne::Database.destroy(:default)
+      Throne::Database.create(:default)
+    end
+  end
 end
