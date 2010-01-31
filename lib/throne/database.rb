@@ -33,6 +33,8 @@ class Throne::Database
     # @return [TrueClass]
     def destroy(db)
       Throne::Request.delete :database => db
+    rescue RestClient::ResourceNotFound
+      true
     end
     
     # List the databases that you've :setup
