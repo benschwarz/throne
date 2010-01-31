@@ -60,7 +60,7 @@ describe Throne::Document do
       doc = TestDocument.create(:field => true)
       TestDocument.destroy(doc._id).should be_true
       lambda { TestDocument.get(doc._id) }.should raise_error(Throne::Document::NotFound)
-      TestDocument.destroy(doc._id).should be_true # subseqent destroys should not raise.
+      TestDocument.destroy(doc._id).should be_true # subsequent destroys should not raise.
     end
   end
   
