@@ -22,9 +22,9 @@ class Throne::DesignDocument
     # :view is mapped to "_design/design-document-name/_view/view-name"
     def execute(name, options = {})    
       if list?(options)
-        document_path = "_list/#{options[:list]}/#{options[:view]}"
+        document_path = "#{name}/_list/#{options[:list]}/#{options[:view]}"
       elsif view?(options)
-        document_path = "_view/#{options[:view]}"
+        document_path = "#{name}/_view/#{options[:view]}"
       else
         document_path = name
       end
