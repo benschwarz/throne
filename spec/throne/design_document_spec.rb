@@ -21,8 +21,17 @@ describe Throne::DesignDocument do
         Throne::DesignDocument.create("instance_of_self").should be_an_instance_of(Throne::DesignDocument)
       end
       
-      it "should create a design document with a list"
-      it "should create a design document with a view"
+      it "should create a design document with a list" do
+        Throne::Request.should_receive(:put).with({:database=>:default, "list"=>"function(){send(toJSON({status: 'success'}))}", "_id"=>"_design/with_a_list", :resource=>"_design/with_a_list", "ruby_class"=>"Throne::Document"})
+        Throne::DesignDocument.create("with_a_list", :list => "function(){send(toJSON({status: 'success'}))}")
+      end
+      
+      it "should create a design document with a view" do
+        Throne::Request.should_receive(:put).with({"_id"=>"_design/with_a_view", :resource=>"_design/with_a_view", "view"=>"function(doc){emit(doc)}", "ruby_class"=>"Throne::Document", :database=>:default})
+        Throne::DesignDocument.create("with_a_view", :view => "function(doc){emit(doc)}")
+      end
+      
+      it "must enforce that a design document view, list, show etc has a name"
     end
     
     describe "get" do
@@ -42,6 +51,13 @@ describe Throne::DesignDocument do
     end
     
     describe "execute" do
+      before :all do
+        Throne::DesignDocument.create("dd-execute-spec", 
+          :views => {:all => {:map => "function(doc) {emit(doc.id, doc)};"}}, 
+          :lists => {:by_date => "function(head, req) {send(toJSON({}))}"}
+        )
+      end
+      
       it "should respond to execute" do
         Throne::DesignDocument.should respond_to(:execute)
       end
@@ -50,18 +66,14 @@ describe Throne::DesignDocument do
         lambda { Throne::DesignDocument.execute }.should raise_error(ArgumentError)
       end
       
-      it "should execute the design document with only a full identifier" do
-        name = "full_identifier"
-        RestClient.should_receive(:get).with("http://127.0.0.1:5984/throne-specs/_design/#{name}/_view/view-name", {:accept_encoding=>"gzip, deflate"})
-        Throne::DesignDocument.execute("#{name}/_view/view-name")
+      it "should execute the design document with only a full identifier " do
+        Throne::DesignDocument.execute("dd-execute-spec/_view/all").should be_an_instance_of(Throne::Document)
       end
       
       it "should execute the design document with symbols"
       
       it "should merge params hash into query strings" do
-       name = "params-to-query-strings" 
-       RestClient.should_receive(:get).with("http://127.0.0.1:5984/throne-specs/_design/#{name}/_list/list-name/view-name?descending=true", {:accept_encoding=>"gzip, deflate"})
-        Throne::DesignDocument.execute("#{name}/_list/list-name/view-name", :params => {:descending => true})
+        Throne::DesignDocument.execute("dd-execute-spec/_list/by_date/all", :params => {:descending => true})
       end
       
       it "should return the result of the design document"
@@ -95,8 +107,7 @@ describe Throne::DesignDocument do
       end
 
       it "should save the design document" do
-        RestClient.should_receive(:put).with("http://127.0.0.1:5984/throne-specs/_design/#{@name}", "{\"_rev\":\"1-fd0d5d7a365f0463d7caba1a2a002fd4\",\"_id\":\"_design/design-doc-instance\",\"ruby_class\":\"Throne::Document\"}", {:accept_encoding=>"gzip, deflate"})
-        @design_doc.save
+        @design_doc.save.should be_true
       end
 
       it "should save the params sent through #save"
@@ -105,10 +116,6 @@ describe Throne::DesignDocument do
     describe "destroy" do
       it "should respond to destroy" do
         @design_doc.should respond_to(:destroy)
-      end
-      
-      it "should require a major name" do
-        lambda { @design_doc.destroy }.should raise_error(ArgumentError)
       end
       
       it "should destroy and return true" do
