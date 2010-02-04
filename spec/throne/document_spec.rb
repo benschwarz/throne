@@ -54,7 +54,7 @@ describe Throne::Document do
     
     it "should get a document with params" do
       doc = TestDocument.create
-      Throne::Request.should_receive(:get).with({:params=>{:descending=>true}, :resource=>doc._id, :database=>:document_specs})
+      Throne::Request.should_receive(:get).with({:params=>{:descending=>true}, :resource=>doc._id, :database=>:document_specs}).and_return(doc)
       TestDocument.get(doc._id, {:descending => true})
     end
     
