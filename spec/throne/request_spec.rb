@@ -18,6 +18,11 @@ describe Throne::Request do
       Throne::Request.get :database => :throne_request_specs, :resource => "document", :params => {:startkey => ["abc", "xyz"]}
     end
     
+    it "should json encode abstract param keys (non-couchy params)" do
+      RestClient.should_receive(:get).with("#{@host}/#{@db}/document?net=%5B%22abc%22%2C%22xyz%22%5D", {:accept_encoding=>"gzip, deflate"})
+      Throne::Request.get :database => :throne_request_specs, :resource => "document", :params => {:net => ["abc", "xyz"]}
+    end
+    
     it "should uri escape each param value" do
       RestClient.should_receive(:get).with("#{@host}/#{@db}/document?descending=true", {:accept_encoding=>"gzip, deflate"})
       Throne::Request.get :database => :throne_request_specs, :resource => "document", :params => {:descending => true}

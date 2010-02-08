@@ -32,7 +32,7 @@ class Throne::Request
     def paramify(params = {})
       if params && !params.empty?
         query = params.map do |k,v|
-          v = Yajl::Encoder.encode(v) if %w{key startkey endkey}.include?(k.to_s) && (v.kind_of?(Array) || v.kind_of?(Hash))
+          v = Yajl::Encoder.encode(v) if (v.kind_of?(Array) || v.kind_of?(Hash))
 
           "#{k}=#{CGI.escape(v.to_s)}"
         end
