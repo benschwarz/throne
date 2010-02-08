@@ -1,6 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Throne::DesignDocument do
+  before :all do
+    Throne::Database.setup(:default, "http://127.0.0.1:5984/throne-specs")
+    Throne::Database.destroy(:default)
+    Throne::Database.create(:default)
+  end
+  
   describe "class" do
     describe "new" do
       it "should require a major name" do
