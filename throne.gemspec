@@ -5,36 +5,41 @@
 
 Gem::Specification.new do |s|
   s.name = %q{throne}
-  s.version = "0.0.6"
+  s.version = "0.0.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Lincoln Stoll"]
-  s.date = %q{2009-12-22}
+  s.authors = ["Lincoln Stoll", "Ben Schwarz"]
+  s.date = %q{2010-02-09}
   s.description = %q{Simple library for working with CouchDB. Avoids magic, keeps it simple.}
   s.email = %q{lstoll@lstoll.net}
   s.extra_rdoc_files = [
     "LICENSE",
-     "README.rdoc",
+     "README.md",
      "TODO"
   ]
   s.files = [
     ".document",
      ".gitignore",
      "LICENSE",
-     "README.rdoc",
+     "README.md",
      "Rakefile",
      "TODO",
      "VERSION",
-     "lib/tasks.rb",
      "lib/throne.rb",
      "lib/throne/database.rb",
+     "lib/throne/design_document.rb",
      "lib/throne/document.rb",
+     "lib/throne/rails.rb",
+     "lib/throne/request.rb",
      "lib/throne/tasks.rb",
-     "spec/database_spec.rb",
-     "spec/document_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
-     "spec/tasks_spec.rb",
+     "spec/throne/database_spec.rb",
+     "spec/throne/design_document_spec.rb",
+     "spec/throne/document_spec.rb",
+     "spec/throne/request_spec.rb",
+     "spec/throne/tasks_spec.rb",
+     "spec/throne_spec.rb",
      "throne.gemspec"
   ]
   s.homepage = %q{http://github.com/lstoll/throne}
@@ -43,10 +48,14 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{Simple CouchDB library}
   s.test_files = [
-    "spec/database_spec.rb",
-     "spec/document_spec.rb",
-     "spec/spec_helper.rb",
-     "spec/tasks_spec.rb"
+    "spec/spec_helper.rb",
+     "spec/throne/database_spec.rb",
+     "spec/throne/design_document_spec.rb",
+     "spec/throne/document_properties_spec.rb",
+     "spec/throne/document_spec.rb",
+     "spec/throne/request_spec.rb",
+     "spec/throne/tasks_spec.rb",
+     "spec/throne_spec.rb"
   ]
 
   if s.respond_to? :specification_version then
@@ -54,21 +63,24 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
-      s.add_runtime_dependency(%q<rest-client>, [">= 0"])
-      s.add_runtime_dependency(%q<hashie>, [">= 0"])
-      s.add_runtime_dependency(%q<yajl-ruby>, [">= 0"])
+      s.add_development_dependency(%q<rspec>, [">= 1.3.0"])
+      s.add_development_dependency(%q<rest-client-components>, [">= 0.2.2"])
+      s.add_runtime_dependency(%q<rest-client>, [">= 1.3.0"])
+      s.add_runtime_dependency(%q<hashie>, [">= 0.1.5"])
+      s.add_runtime_dependency(%q<yajl-ruby>, [">= 0.6.7"])
     else
-      s.add_dependency(%q<rspec>, [">= 1.2.9"])
-      s.add_dependency(%q<rest-client>, [">= 0"])
-      s.add_dependency(%q<hashie>, [">= 0"])
-      s.add_dependency(%q<yajl-ruby>, [">= 0"])
+      s.add_dependency(%q<rspec>, [">= 1.3.0"])
+      s.add_dependency(%q<rest-client-components>, [">= 0.2.2"])
+      s.add_dependency(%q<rest-client>, [">= 1.3.0"])
+      s.add_dependency(%q<hashie>, [">= 0.1.5"])
+      s.add_dependency(%q<yajl-ruby>, [">= 0.6.7"])
     end
   else
-    s.add_dependency(%q<rspec>, [">= 1.2.9"])
-    s.add_dependency(%q<rest-client>, [">= 0"])
-    s.add_dependency(%q<hashie>, [">= 0"])
-    s.add_dependency(%q<yajl-ruby>, [">= 0"])
+    s.add_dependency(%q<rspec>, [">= 1.3.0"])
+    s.add_dependency(%q<rest-client-components>, [">= 0.2.2"])
+    s.add_dependency(%q<rest-client>, [">= 1.3.0"])
+    s.add_dependency(%q<hashie>, [">= 0.1.5"])
+    s.add_dependency(%q<yajl-ruby>, [">= 0.6.7"])
   end
 end
 
